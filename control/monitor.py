@@ -24,7 +24,7 @@ def analyze_data():
         .select_related('station__user', 'station__location') \
         .select_related('station__location__city', 'station__location__state',
                         'station__location__country') \
-        .values('value', 'station__user__username',
+        .values('values', 'station__user__username',
                 'measurement__name',
                 'measurement__max_value',
                 'measurement__min_value',
@@ -34,7 +34,7 @@ def analyze_data():
     
     for item in data:
        
-        value = item["value"]
+        value = item["values"]
         variable = item["measurement__name"]
         max_value = item["measurement__max_value"] or 0
 
@@ -43,7 +43,7 @@ def analyze_data():
         city = item['station__location__city__name']
         user = item['station__user__username']
 
-        if item["value"] > max_value:
+        if item["values"] > max_value:
             print("Alerta, "+variable+" maxima")
             message = "ALERT {} {} {}".format(" "+variable, value)
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
