@@ -46,7 +46,7 @@ def analyze_data():
 
         if value > max_value:
             print("Alerta, "+variable+" maxima")
-            message = "ALERT {} {} {}".format(" "+variable, value)
+            message = "ALERT {} {}".format(" "+variable, value)
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
             print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
             client.publish(topic, message)
