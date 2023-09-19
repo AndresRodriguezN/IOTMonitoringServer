@@ -19,43 +19,38 @@ def analyze_data():
     print("Calculando alertas...")
 
     data = Data.objects.filter(
-        base_time__gte=datetime.now() - timedelta(hours=1))
-    aggregation = data.annotate(check_value=Avg('avg_value')) \
+        base_time__gte=datetime.now() - timedelta(hours=1))\
         .select_related('station', 'measurement') \
         .select_related('station__user', 'station__location') \
         .select_related('station__location__city', 'station__location__state',
                         'station__location__country') \
-        .values('check_value', 'station__user__username',
+        .values('value', 'station__user__username',
                 'measurement__name',
                 'measurement__max_value',
                 'measurement__min_value',
                 'station__location__city__name',
                 'station__location__state__name',
                 'station__location__country__name')
-    alerts = 0
-    for item in aggregation:
-        alert = False
-
+    
+    for item in data:
+       
+        value = item["value"]
         variable = item["measurement__name"]
         max_value = item["measurement__max_value"] or 0
-        min_value = item["measurement__min_value"] or 0
 
         country = item['station__location__country__name']
         state = item['station__location__state__name']
         city = item['station__location__city__name']
         user = item['station__user__username']
 
-        if item["check_value"] > max_value or item["check_value"] < min_value:
-            alert = True
-
-        if alert:
-            message = "ALERT {} {} {}".format(variable, min_value, max_value)
+        if item["value"] > max_value:
+            print("Alerta, "+variable+" maxima")
+            message = "ALERT {} {} {}".format(" "+variable, value)
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
             print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
             client.publish(topic, message)
             alerts += 1
 
-    print(len(aggregation), "dispositivos revisados")
     print(alerts, "alertas enviadas")
 
 
