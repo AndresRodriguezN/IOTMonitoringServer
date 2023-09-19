@@ -34,7 +34,7 @@ def analyze_data():
     
     for item in data:
        
-        value = item["values"]
+        values = item["values"]
         variable = item["measurement__name"]
         max_value = item["measurement__max_value"] or 0
 
@@ -42,8 +42,9 @@ def analyze_data():
         state = item['station__location__state__name']
         city = item['station__location__city__name']
         user = item['station__user__username']
+        value = float(values[-1])
 
-        if item["values"] > max_value:
+        if value > max_value:
             print("Alerta, "+variable+" maxima")
             message = "ALERT {} {} {}".format(" "+variable, value)
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
